@@ -2,126 +2,119 @@
 #include <string>
 #include "../include/lexer.h"
 #include "../include/parser.h"
-#include "../include/ast.h"
-
-
-
-// ─────────────────────────────────────────
-//  Helper: converts TokenType → readable string
-//  (only needed for debug printing)
-// ─────────────────────────────────────────
-std::string tokenTypeName(TokenType type) {
-    switch (type) {
-        case TokenType::NUMBER:      return "NUMBER";
-        case TokenType::IDENTIFIER:  return "IDENTIFIER";
-        case TokenType::LET:         return "LET";
-        case TokenType::PRINT:       return "PRINT";
-        case TokenType::PLUS:        return "PLUS";
-        case TokenType::MINUS:       return "MINUS";
-        case TokenType::STAR:        return "STAR";
-        case TokenType::SLASH:       return "SLASH";
-        case TokenType::EQUALS:      return "EQUALS";
-        case TokenType::LPAREN:      return "LPAREN";
-        case TokenType::RPAREN:      return "RPAREN";
-        case TokenType::SEMICOLON:   return "SEMICOLON";
-        case TokenType::END_OF_FILE: return "EOF";
-        case TokenType::UNKNOWN:     return "UNKNOWN";
-        default:                     return "???";
-    }
-}
-
-
-
-// ─────────────────────────────────────────────────────────────
-//  AST Printer — walks the tree and prints it visually
-//
-//  'indent' grows by 2 spaces at each level so you can
-//  see the tree structure in the terminal.
-//
-//  dynamic_cast figures out which node type we're looking at
-//  since all nodes are stored as base class ASTNode*
-// ─────────────────────────────────────────────────────────────
-void printAST(const ASTNode* node, int indent = 0) {
-    std::string pad(indent, ' ');
- 
-    if (!node) {
-        std::cout << pad << "(null)\n";
-        return;
-    }
- 
-    if (auto* n = dynamic_cast<const ProgramNode*>(node)) {
-        std::cout << pad << "ProgramNode\n";
-        for (const auto& stmt : n->statements)
-            printAST(stmt.get(), indent + 2);
-    }
-    else if (auto* n = dynamic_cast<const LetNode*>(node)) {
-        std::cout << pad << "LetNode (name=\"" << n->name << "\")\n";
-        printAST(n->value.get(), indent + 2);
-    }
-    else if (auto* n = dynamic_cast<const PrintNode*>(node)) {
-        std::cout << pad << "PrintNode\n";
-        printAST(n->expr.get(), indent + 2);
-    }
-    else if (auto* n = dynamic_cast<const BinaryOpNode*>(node)) {
-        std::cout << pad << "BinaryOpNode (op='" << n->op << "')\n";
-        std::cout << pad << "  [left]\n";
-        printAST(n->left.get(),  indent + 4);
-        std::cout << pad << "  [right]\n";
-        printAST(n->right.get(), indent + 4);
-    }
-    else if (auto* n = dynamic_cast<const NumberNode*>(node)) {
-        std::cout << pad << "NumberNode (value=" << n->value << ")\n";
-    }
-    else if (auto* n = dynamic_cast<const VarNode*>(node)) {
-        std::cout << pad << "VarNode (name=\"" << n->name << "\")\n";
-    }
-    else {
-        std::cout << pad << "(unknown node)\n";
-    }
-}
-
+#include "../include/interpreter.h"
 
 int main() {
-    std::cout << "NeoLang v0.1 — Lexer Test\n";
-    std::cout << "==========================\n\n";
+    std::cout << "==============================\n";
+    std::cout << "  NeoLang v0.3 - Interpreter  \n";
+    std::cout << "==============================\n\n";
 
-    // ── Test source code ─────────────────
-    std::string source = R"(
-        let x = 10;
-        let y = x + 5;
-        print(y);
-    )";
+    // ─────────────────────────────────────
+    //  TEST 1: Basic variable + print
+    // ─────────────────────────────────────
+    {
+        std::cout << "--- Test 1: Basic variable ---\n";
+        std::string src = R"(
+            let x = 10;
+            let y = x + 5;
+            print(y);
+        )";
 
-    std::cout << "Source:\n" << source << "\n";
-    std::cout << "Tokens:\n";
-    std::cout << "--------------------------\n";
+        Lexer  lexer(src);
+        Parser parser(lexer.tokenize());
+        auto   ast = parser.parse();
 
-    // ── Run the lexer ─────────────────────
-    //Step-1:Tokenize the source code into tokens
-    Lexer lexer(source);
-    std::vector<Token> tokens = lexer.tokenize();
-     
-    // ── Print each token ──────────────────
-    for (const Token& tok : tokens) {
-        std::cout << "Line " << tok.line
-                  << "  |  "
-                  << tokenTypeName(tok.type)
-                  << "\t\"" << tok.value << "\"\n";
+        Interpreter interp;
+        interp.run(ast.get());
+        // Expected output: 15
     }
-    
 
-    
- 
-    // Step 2: Parse
-    Parser parser(std::move(tokens));
-    auto ast = parser.parse();
- 
-    // Step 3: Print the AST
-    std::cout << "AST:\n";
-    std::cout << "----------------------------\n";
-    printAST(ast.get());
+    // ─────────────────────────────────────
+    //  TEST 2: Operator precedence
+    //  2 + 3 * 4 should be 14, not 20
+    // ─────────────────────────────────────
+    {
+        std::cout << "\n--- Test 2: Precedence (expect 14) ---\n";
+        std::string src = R"(
+            let result = 2 + 3 * 4;
+            print(result);
+        )";
 
+        Lexer  lexer(src);
+        Parser parser(lexer.tokenize());
+        auto   ast = parser.parse();
 
-     
+        Interpreter interp;
+        interp.run(ast.get());
+        // Expected output: 14
+    }
+
+    // ─────────────────────────────────────
+    //  TEST 3: Parentheses override
+    //  (2 + 3) * 4 should be 20
+    // ─────────────────────────────────────
+    {
+        std::cout << "\n--- Test 3: Parens (expect 20) ---\n";
+        std::string src = R"(
+            let result = (2 + 3) * 4;
+            print(result);
+        )";
+
+        Lexer  lexer(src);
+        Parser parser(lexer.tokenize());
+        auto   ast = parser.parse();
+
+        Interpreter interp;
+        interp.run(ast.get());
+        // Expected output: 20
+    }
+
+    // ─────────────────────────────────────
+    //  TEST 4: Chained variables
+    // ─────────────────────────────────────
+    {
+        std::cout << "\n--- Test 4: Chained vars (expect 100) ---\n";
+        std::string src = R"(
+            let a = 10;
+            let b = a * 2;
+            let c = b + a * 8;
+            print(c);
+        )";
+
+        Lexer  lexer(src);
+        Parser parser(lexer.tokenize());
+        auto   ast = parser.parse();
+
+        Interpreter interp;
+        interp.run(ast.get());
+        // Expected: a=10, b=20, c = 20 + 80 = 100
+    }
+
+    // ─────────────────────────────────────
+    //  TEST 5: Runtime error — undefined var
+    // ─────────────────────────────────────
+    {
+        std::cout << "\n--- Test 5: Undefined variable error ---\n";
+        std::string src = R"(
+            print(z);
+        )";
+
+        try {
+            Lexer  lexer(src);
+            Parser parser(lexer.tokenize());
+            auto   ast = parser.parse();
+
+            Interpreter interp;
+            interp.run(ast.get());
+        } catch (const std::exception& e) {
+            std::cout << "Caught: " << e.what() << "\n";
+            // Expected: error saying z is not declared
+        }
+    }
+
+    std::cout << "\n==============================\n";
+    std::cout << "  All tests done!\n";
+    std::cout << "==============================\n";
+
     return 0;
 }
