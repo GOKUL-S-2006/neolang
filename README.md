@@ -1,193 +1,133 @@
+# 🚀 NeoLang — A Mini Programming Language built in C++
 
+NeoLang is a custom programming language built from scratch in C++. It implements a complete compiler pipeline and an interactive shell, designed to demonstrate how real languages work internally.
 
-
-<img width="1132" height="386" alt="ChatGPT Image Jun 25, 2026, 12_12_42 AM" src="https://github.com/user-attachments/assets/1e70f336-1187-41f3-92da-b4344960edf9" />
-
-
-
-# 🚀 NeoLang — AI-Powered Mini Programming Language
-
-NeoLang is a beginner-friendly yet powerful custom programming language built using C++. It is designed to demonstrate how compilers and interpreters work internally, while also introducing AI-inspired capabilities such as natural language to code conversion and intelligent error suggestions.
+Built as a learning project — every component written by hand, no libraries, no shortcuts.
 
 ---
 
-## 🧾 Overview
+## ✨ What NeoLang Can Do
 
-NeoLang provides a complete compiler pipeline:
+```neolang
+let x = 10;
+let y = x + 5;
+print(y);         → 15
 
-**Lexer → Parser → AST → Interpreter**
+let result = 2 + 3 * 4;
+print(result);    → 14  (correct precedence)
 
-Along with this, it introduces smart features that make programming more intuitive and beginner-friendly.
+let a = (2 + 3) * 4;
+print(a);         → 20  (parentheses work)
+```
 
----
+You can also use plain English:
 
-## ✨ Features
-
-### ✅ Core Compiler Features
-
-* 🔤 **Lexical Analysis (Tokenizer)**
-  Converts source code into tokens.
-
-* 🌳 **Syntax Parsing (Recursive Descent Parser)**
-  Validates syntax and builds structured representations.
-
-* 🧠 **Abstract Syntax Tree (AST)**
-  Represents program structure in a tree format.
-
-* ⚙️ **Interpreter**
-  Executes the AST directly.
-
-* 📦 **Symbol Table**
-  Stores variables and manages scope.
+```
+print sum of 10 and 20         → 30
+store 5 times 4 in result
+print result                   → 20
+print difference of 100 and 45 → 55
+```
 
 ---
 
-### 🤖 AI Features (Key Differentiator)
+## 🧩 Architecture
 
-* 🔥 **Natural Language → Code Conversion**
-  Example:
-
-  ```
-  Input:  print sum of 10 and 20
-  Output: print(10 + 20);
-  ```
-
-* 🔥 **Smart Error Suggestions**
-  Example:
-
-  ```
-  Error: Unexpected token '+'
-  Suggestion: Did you forget a number before '+'?
-  ```
+```
+Source Code / Natural Language
+              ↓
+       NLP Converter          (English → NeoLang syntax)
+              ↓
+           Lexer              (text → tokens)
+              ↓
+           Parser             (tokens → AST)
+              ↓
+              AST             (Abstract Syntax Tree)
+              ↓
+        Interpreter           (walks AST, executes it)
+              ↓
+           Output
+```
 
 ---
 
-## 🚧 Upcoming Features
+## ✅ Features
 
-* 🖥️ REPL (Interactive Shell)
-* 🌲 AST Visualization
-* 📘 Code Explanation Engine
-* 🔁 Control Flow (if-else, loops)
-* 🔧 Functions & Modular Code
+### Compiler Pipeline
+- **Lexer** — tokenizes source code character by character
+- **Recursive Descent Parser** — validates syntax, builds AST
+- **AST** — tree representation of program structure
+- **Interpreter** — tree-walk executor with symbol table
+- **Symbol Table** — stores and looks up variable values
+
+### Language Features
+- Variable declaration with `let`
+- Arithmetic: `+ - * /`
+- Correct operator precedence (`*` before `+`)
+- Parentheses to override precedence
+- `print()` statements
+- Meaningful runtime error messages
+
+### NLP Converter
+Translate plain English into NeoLang code:
+
+| Input | Generated Code |
+|---|---|
+| `print sum of 10 and 20` | `print(10 + 20);` |
+| `print difference of 100 and 45` | `print(100 - 45);` |
+| `print product of 4 and 5` | `print(4 * 5);` |
+| `print quotient of 20 and 4` | `print(20 / 4);` |
+| `store 5 times 4 in result` | `let result = 5 * 4;` |
+| `store sum of 3 and 7 in total` | `let total = 3 + 7;` |
+| `store 10 in x` | `let x = 10;` |
+| `print x` | `print(x);` |
+
+Case-insensitive — `Print Sum Of 10 And 20` works too.
+
+### REPL (Interactive Shell)
+- Type and run NeoLang line by line
+- Variables persist across lines
+- Errors are caught and reported — shell keeps running
+- Raw NeoLang and English input both work
 
 ---
 
 ## 🛠️ Tech Stack
 
-### 💻 Core
-
-* **Language:** C++
-* **Compiler:** g++ / clang++
-* **Build Tools:** Makefile or CMake
-
-### 📚 Libraries
-
-* STL (vector, map, stack, string)
-
-**Optional:**
-
-* `regex` (for tokenizing)
-* `fstream` (for file handling)
+- **Language:** C++
+- **Compiler:** g++ / clang++
+- **Libraries:** STL only (`vector`, `map`, `string`, `sstream`)
 
 ---
-
-<img width="1536" height="1024" alt="ChatGPT Image Jun 25, 2026, 12_03_01 AM" src="https://github.com/user-attachments/assets/78e5e2c2-2575-4181-ad49-ab76242abd30" />
-
-
-## 🧩 Architecture
-
-```
-                Input Layer
-     (Source Code / Natural Language)
-                         ↓
-                 NLP Converter
-                         ↓
-                ─────────────────
-                Compiler Pipeline
-                ─────────────────
-                         ↓
-                      Lexer
-                (Tokenization)
-                         ↓
-                      Parser
-               (Syntax Analysis)
-                         ↓
-                        AST
-        (Abstract Syntax Tree Representation)
-                         ↓
-                   Interpreter
-                 (Execution Engine)
-                         ↓
-                     Output
-                 (Execution Result)
-
---------------------------------------------------
-
-                 Core Services
-   (Used across all pipeline stages)
-
-   • Symbol Table
-   • Type System
-   • Error Handler
-   • Suggestion Engine
-   • Logger
-
---------------------------------------------------
-
-                Infrastructure Layer
-
-   • File Manager
-   • Config Manager
-   • Module Manager
-   • Utilities
-   • Build System
-```
-
 
 ## 📁 Project Structure
 
 ```
 neolang/
-│
+├── include/
+│   ├── lexer.h
+│   ├── parser.h
+│   ├── ast.h
+│   ├── interpreter.h
+│   ├── nlp.h
+│   └── repl.h
 ├── src/
-│   ├── lexer.cpp / lexer.h
-│   ├── parser.cpp / parser.h
-│   ├── ast.cpp / ast.h
-│   ├── interpreter.cpp / interpreter.h
-│   ├── nlp.cpp / nlp.h
-│   ├── utils.cpp / utils.h
+│   ├── lexer.cpp
+│   ├── parser.cpp
+│   ├── interpreter.cpp
+│   ├── nlp.cpp
+│   ├── repl.cpp
 │   └── main.cpp
-│
 ├── examples/
-│   ├── test1.neo
-│   ├── test2.neo
-│
-├── README.md
-├── Makefile / CMakeLists.txt
+│   └── test1.neo
+└── README.md
 ```
-
----
-
-## 🔤 Language Syntax (Phase 1)
-
-```neolang
-let x = 10;
-let y = x + 5;
-
-print(y);
-```
-
-### ✅ Supported Features
-
-* Variables (`let`)
-* Arithmetic (`+ - * /`)
-* Print statements
 
 ---
 
 ## 🚀 Getting Started
 
-### 1. Clone the Repository
+### 1. Clone the repository
 
 ```bash
 git clone https://github.com/your-username/neolang.git
@@ -197,10 +137,17 @@ cd neolang
 ### 2. Build
 
 ```bash
-g++ src/*.cpp -o neolang
+g++ src/main.cpp src/lexer.cpp src/parser.cpp src/interpreter.cpp src/repl.cpp src/nlp.cpp -I include -o neolang
 ```
 
-### 3. Run
+### 3. Run — Interactive REPL
+
+```bash
+./neolang          # Linux/Mac
+neolang.exe        # Windows
+```
+
+### 4. Run — Execute a file
 
 ```bash
 ./neolang examples/test1.neo
@@ -208,95 +155,68 @@ g++ src/*.cpp -o neolang
 
 ---
 
-## 🧠 How It Works
+## 🧠 How the Pipeline Works
 
-| Stage       | Description                 |
-| ----------- | --------------------------- |
-| Lexer       | Converts code → tokens      |
-| Parser      | Tokens → AST                |
-| AST         | Tree representation of code |
-| Interpreter | Executes the AST            |
+| Stage | Input | Output |
+|---|---|---|
+| NLP Converter | `print sum of 10 and 20` | `print(10 + 20);` |
+| Lexer | `print(10 + 20);` | `[PRINT][LPAREN][NUMBER:10][PLUS][NUMBER:20][RPAREN][SEMICOLON]` |
+| Parser | token list | AST tree |
+| Interpreter | AST tree | `30` printed to terminal |
 
 ---
 
-## 🤝 Contributing
+## 🔤 Language Syntax
 
-We ❤️ contributions! Follow these steps:
-
-### 🔹 How to Contribute
-
-```bash
-# Fork the repository
-git checkout -b feature/your-feature
-
-# Make your changes
-git commit -m "Add: your feature"
-
-# Push changes
-git push origin feature/your-feature
+```neolang
+let x = 10;
+let y = x + 5;
+print(y);
 ```
 
-Then open a Pull Request 🚀
+```neolang
+let result = (2 + 3) * 4;
+print(result);
+```
+
+Exit the REPL:
+```
+exit   or   quit   or   :q
+```
 
 ---
 
-### 🔹 Contribution Guidelines
+## 🔹 Code Style
 
-* Write clean, readable C++ code
-* Follow consistent naming conventions
-* Add comments for complex logic
-* Do not break existing functionality
-* Add test cases in `/examples`
-* Keep PRs small and focused
-
----
-
-### 🔹 Code Style
-
-* Use **camelCase** for variables
-* Use **PascalCase** for classes
-* Keep functions small & modular
-* Prefer `const` wherever possible
+- `PascalCase` for classes (`Lexer`, `Parser`, `ASTNode`)
+- `camelCase` for variables and functions
+- `m_` prefix for class member variables (`m_symbols`, `m_pos`)
+- `const` wherever possible
+- `unique_ptr` for all owned pointers — no raw `new`/`delete`
 
 ---
 
-### 🔹 Commit Message Format
+## 🔹 Commit Message Format
 
-* `Add:` New feature
-* `Fix:` Bug fix
-* `Refactor:` Code improvement
-* `Docs:` Documentation updates
-
----
-
-## 🐛 Issues & Bugs
-
-Use GitHub Issues to report bugs.
-
-Please include:
-
-* Expected behavior
-* Actual behavior
-* Steps to reproduce
+- `Add:` New feature
+- `Fix:` Bug fix
+- `Refactor:` Code improvement
+- `Docs:` Documentation updates
 
 ---
 
 ## 🌟 Roadmap
 
-* ✅ Lexer
-* ✅ Parser
-* ✅ AST
-* ✅ Interpreter
-* 🔄 NLP Module
-* 🔄 REPL
-* 🔄 Error Suggestion System
+- ✅ Lexer
+- ✅ Parser + AST
+- ✅ Interpreter + Symbol Table
+- ✅ REPL
+- ✅ NLP Converter
+- 🔄 if / else statements
+- 🔄 while loops
+- 🔄 Functions
+- 🔄 String support
 
 ---
 
-## 💡 Vision
-
-NeoLang aims to bridge the gap between learning and building by combining compiler fundamentals with AI-driven enhancements — making programming more intuitive, educational, and powerful.
-
----
-
-⭐ If you like this project, consider giving it a star!
+⭐ If you found this useful, give it a star!
